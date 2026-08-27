@@ -1,0 +1,228 @@
+import os #Bibioteca para habilitar cmd's terminal
+import sqlite3 #Banco de dados
+
+# Variável com o nome do BD a ser criado
+CAMINHO_BANCO = "jogos.db"
+
+def exibir_cabecalho(texto):
+    os.system('cls') # Limpa a tela
+
+    # Cria um efeito visual na palavra "GameVault"
+    linha ="*" *len(texto)
+    print(linha)
+    print(texto)
+    print(linha)
+    print() #Linha em branco
+
+exibir_cabecalho("GameVault")
+
+def inicializar_banco():
+    # Abre a conexão com o banco de dados (O indicado em: "CAMINHO_BANCO" no caso: "jogos.db")
+    conn = sqlite3.connect(CAMINHO_BANCO)
+
+    # Diz ao BD que de fato SQL está habilitado
+    cursor = conn.cursor() 
+
+    # Executa de fato o comando SQL descrito abaixo
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS jogos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo TEXT NOT NULL,
+            plataforma TEXT NOT NULL,
+            zerado BOOLEAN NOT NULL DEFAULT 0
+        )
+        """
+    )
+
+    # Funciona como "Ctrl + S" ou salva, ele que grava
+    conn.commit()
+    # Fecha a conexão
+    conn.close()
+
+# Chamando a função
+inicializar_banco()
+
+
+def listar_jogos():
+    conn = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conn.cursor() 
+    cursor.execute("SELECT titulo, plataforma, zerado FROM jogos")
+
+    # "fetchall" - Devolve TODAS as linhas do resultado como uma Tupla
+    jogos = cursor.fetchall()
+
+    conn.close()
+
+    # Se BD vazio mostra a mensagem abaixo
+    if not jogos:
+        print("Nenhum jogo cadastrado ainda!\n")
+        return
+
+    # Formam o cabeçalho visual antes de listar com 55 traços e alinhamento a esquerda "ljust"
+    print(f"{'Título'.ljust(25)} | {'Plataforma'.ljust(12)} | Status")
+    print("-" * 55)
+
+    # Laço para exibir todos os jogos cadastrados
+    for titulo, plataforma, zerado in jogos:
+        status = "zerado" if zerado else "jogando"
+        print(f"{titulo.ljust(25)} | {plataforma.ljust(12)} | {status}")
+
+    print() #Linha em branco para não colar no próximo print
+
+# Chamando a função
+listar_jogos()
+
+import os #Bibioteca para habilitar cmd's terminal
+import sqlite3 #Banco de dados
+
+# Variável com o nome do BD a ser criado
+CAMINHO_BANCO = "jogos.db"
+
+def exibir_cabecalho(texto):
+    os.system('cls') # Limpa a tela
+
+    # Cria um efeito visual na palavra "GameVault"
+    linha ="*" *len(texto)
+    print(linha)
+    print(texto)
+    print(linha)
+    print() #Linha em branco
+
+exibir_cabecalho("GameVault")
+
+def inicializar_banco():
+    # Abre a conexão com o banco de dados (O indicado em: "CAMINHO_BANCO" no caso: "jogos.db")
+    conn = sqlite3.connect(CAMINHO_BANCO)
+
+    # Diz ao BD que de fato SQL está habilitado
+    cursor = conn.cursor() 
+
+    # Executa de fato o comando SQL descrito abaixo
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS jogos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo TEXT NOT NULL,
+            plataforma TEXT NOT NULL,
+            zerado BOOLEAN NOT NULL DEFAULT 0
+        )
+        """
+    )
+
+    # Funciona como "Ctrl + S" ou salva, ele que grava
+    conn.commit()
+    # Fecha a conexão
+    conn.close()
+
+# Chamando a função
+inicializar_banco()
+
+
+def listar_jogos():
+    conn = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conn.cursor() 
+    cursor.execute("SELECT titulo, plataforma, zerado FROM jogos")
+
+    # "fetchall" - Devolve TODAS as linhas do resultado como uma Tupla
+    jogos = cursor.fetchall()
+
+    conn.close()
+
+    # Se BD vazio mostra a mensagem abaixo
+    if not jogos:
+        print("Nenhum jogo cadastrado ainda!\n")
+        return
+
+    # Formam o cabeçalho visual antes de listar com 55 traços e alinhamento a esquerda "ljust"
+    print(f"{'Título'.ljust(25)} | {'Plataforma'.ljust(12)} | Status")
+    print("-" * 55)
+
+    # Laço para exibir todos os jogos cadastrados
+    for titulo, plataforma, zerado in jogos:
+        status = "zerado" if zerado else "jogando"
+        print(f"{titulo.ljust(25)} | {plataforma.ljust(12)} | {status}")
+
+    print() #Linha em branco para não colar no próximo print
+
+# Chamando a função
+listar_jogos()
+
+def adicionar_jogo(titulo, plataforma):
+    conn = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conn.cursor() 
+    # SQL - Para inserir novos jogos
+    cursor.execute("INSERT INTO jogos (titulo, plataforma, zerado) VALUES (?, ?, ?)", (titulo, plataforma, False),
+    )
+
+    conn.commit()
+    conn.close()
+
+def marcar_como_zerado(titulo):
+    conn = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conn.cursor() 
+        # SQL - Para inserir novos jogos
+    cursor.execute("UPDATE jogos SET zerado = ? WHERE titulo = ?", (True, titulo),
+        )
+
+
+    # Guarda quantas linhas foram afetadas na atualização 
+    encontrou = cursor.rowcount > 0
+
+
+    conn.commit()
+    conn.close()
+    return encontrou
+
+
+def exibir_menu():
+    exibir_cabecalho("🎮 GameVault")
+    print("1. Adicionar jogo")
+    print("2. Listar jogos")
+    print("3. Marcar como zerado")
+    print("4. Sair\n")
+
+def pausar():
+    input("Pressione Enter para voltar ao menu...")
+
+def main():
+    inicializar_banco()
+
+    while True:
+        exibir_menu()
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            exibir_cabecalho("Adicionar Jogo")
+            titulo = input("Digite o título do jogo: ")
+            plataforma = input("Digite a plataforma do jogo: ")
+            adicionar_jogo(titulo, plataforma)
+            print(f"\n '{titulo}' adicionado com sucesso!\n")
+            pausar()
+
+        elif opcao == "2":
+            exibir_cabecalho("Lista de Jogos")
+            listar_jogos()
+            pausar()
+
+        elif opcao == "3":
+            exibir_cabecalho("Marcar como Zerado")
+            titulo = input("Titulo do jogo que zerou: ")
+
+            if marcar_como_zerado(titulo):
+                print(f"\n '{titulo}' marcado como zerado com sucesso!\n")
+            else:
+                print(f"\n Jogo '{titulo}' não encontrado!\n")
+                print("Verifique se digitou corretamente o título do jogo.\n")
+            pausar()
+
+        elif opcao == "4":
+            print("Saindo do GameVault. Até a próxima! 👌")
+            break
+
+        else: 
+            print("Opção inválida! Escolha um número entre 1 e 4.\n")
+            pausar()
+
+if __name__ == "__main__":
+    main()
