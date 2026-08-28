@@ -165,6 +165,13 @@ def marcar_como_zerado(titulo):
     cursor.execute("UPDATE jogos SET zerado = ? WHERE titulo = ?", (True, titulo),
         )
 
+def remover_jogo(titulo):
+    conn = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conn.cursor()
+    # SQL - Para remover um jogo pelo título
+    cursor.execute("DELETE FROM jogos WHERE titulo = ?", (titulo,))
+
+
 
     # Guarda quantas linhas foram afetadas na atualização 
     encontrou = cursor.rowcount > 0
@@ -174,13 +181,45 @@ def marcar_como_zerado(titulo):
     conn.close()
     return encontrou
 
+def buscar_jogo(titulo):
+    conn = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conn.cursor()
+
+    # SQL - Para buscar um jogo pelo título
+    cursor.execute("SELECT titulo, plataforma, FROM jogos WHERE titulo = ?", (titulo,)
+    )
+
+    jogo = cursor.fetchone()
+
+    conn.close()
+    return jogo
+
+def atualizar_jogo(titulo_atual, novo_titulo, nova_plataforma):
+
+
+    conn = sqlite3.connect(CAMINHO_BANCO)
+    cursor = conn.cursor()
+
+    cursor.execute ("UPDATE jogos SET titulo = ?, plataforma =? WHERE titulo =?",(novo_titulo, nova_plataforma, titulo_atual),
+    )
+
+    # Guarda quantas linhas foram afetadas na atualização 
+    encontrou = cursor.rowcount > 0
+
+    conn.commit()
+    conn.close()
+    return encontrou
+
+
 
 def exibir_menu():
     exibir_cabecalho("🎮 GameVault")
     print("1. Adicionar jogo")
     print("2. Listar jogos")
     print("3. Marcar como zerado")
-    print("4. Sair\n")
+    print("4. Remover jogo")
+    print("5. Sair")
+    print("6. Editar jogo\n")
 
 def pausar():
     input("Pressione Enter para voltar ao menu...")
@@ -217,12 +256,37 @@ def main():
             pausar()
 
         elif opcao == "4":
+            exibir_cabecalho("Remover Jogo")
+            titulo = input("Digite o título do jogo que deseja remover: ")
+
+            if remover_jogo(titulo):
+                print(f"\n '{titulo}' removido com sucesso!\n")
+            else:
+                print(f"\n Jogo '{titulo}' não encontrado!\n")
+                print("Verifique se digitou corretamente o título do jogo.\n")
+            pausar()
+
+        elif opcao == "5":
             print("Saindo do GameVault. Até a próxima! 👌")
             break
 
-        else: 
-            print("Opção inválida! Escolha um número entre 1 e 4.\n")
+        elif opcao == "6":
+            exibir_cabecalho("Editar Jogo")
+            titulo_atual = input("Digite o título do jogo que deseja editar: ")
+            novo_titulo = input("Digite o novo título do jogo: ")
+            nova_plataforma = input("Digite a nova plataforma do jogo: ")
+
+            if atualizar_jogo(titulo_atual, novo_titulo, nova_plataforma):
+                print(f"\n '{titulo_atual}' atualizado com sucesso!\n")
+            else:
+                print(f"\n Jogo '{titulo_atual}' não encontrado!\n")
+                print("Verifique se digitou corretamente o título do jogo.\n")
             pausar()
 
+        else: 
+                print("Opção inválida! Escolha um número entre 1 e 6.\n")
+                pausar()
+    
+4
 if __name__ == "__main__":
-    main() 
+    main()
